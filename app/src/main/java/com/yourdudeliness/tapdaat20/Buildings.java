@@ -29,12 +29,11 @@ public class Buildings {
         if (costOfNext <= PlayScreen.currScore) {
             PlayScreen.currScore -= costOfNext;//subtracts the cost of the building
             Update.printScore();
-            PlayScreen.checkFunds();
-
+            Update.funds();
             totalBuildings += 1;//increments number of buildings
             cumulativePassive = BasePassive * totalBuildings;
-            //PlayScreen.updatePassive();
-            //MainActivity.currPassive += BasePassive * passiveMultiplier;//increments passive score in main
+            Update.passive();
+
 
             costOfNext *= 1.15; //increments the cost of the next building by 7%
             //checkUpgrades();
