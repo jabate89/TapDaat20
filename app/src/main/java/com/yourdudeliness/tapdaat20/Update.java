@@ -44,35 +44,40 @@ public class Update {
             case R.id.pathos_1:
                 if (PlayScreen.pathosEnabled) {
                     PlayScreen.pathos1.build();
+                    PlayScreen.p1.setText(PlayScreen.pathos1.printStats());
                 }
                 break;
             case R.id.pathos_2:
                 if (PlayScreen.pathosEnabled) {
                     PlayScreen.pathos2.build();
+                    PlayScreen.p2.setText(PlayScreen.pathos2.printStats());
+
                 }
                 break;
 
             case R.id.pathos_3:
                 if (PlayScreen.pathosEnabled) {
                     PlayScreen.pathos3.build();
+                    PlayScreen.p3.setText(PlayScreen.pathos3.printStats());
                 }
                 break;
             case R.id.deity:
                 if (PlayScreen.pathosEnabled) {
                     PlayScreen.deity.build();
+                    PlayScreen.dt.setText(PlayScreen.deity.printStats());
                 }
                 break;
             case R.id.power_1:
-                //SpellCast.power1();
+                Spells.power1();
                 break;
             case R.id.power_2:
                 if (PlayScreen.pathosEnabled) {
-                    //SpellCast.power2();
+                    Spells.power2();
                 }
                 break;
             case R.id.power_3:
                 if (PlayScreen.pathosEnabled) {
-                    //SpellCast.power3();
+                    Spells.power3();
                 }
                 break;
         }
@@ -86,8 +91,13 @@ public class Update {
         PlayScreen.currScore += PlayScreen.currClickVal;
         PlayScreen.totalClickValue += PlayScreen.currClickVal;
         PlayScreen.totalClicks += 1;
+        funds();
         printScore();
-        //primary_activity.testbox.setText(Integer.toString(MainActivity.totalClickValue));
+
+        if((PlayScreen.gemGen.nextInt(100)) < PlayScreen.gemProbability){
+            Gems.generateGem(PlayScreen.gemGen.nextInt(3));
+        }
+
 
         //checkUpgrades();
 
@@ -99,27 +109,31 @@ public class Update {
             coinCollection.generateCoin(coinGen.nextInt(3));
         }
 
-        checkFunds();
         */
 
 
     }
 
     protected static void printScore(){
-        PlayScreen.scoreBox.setText("Total " + PlayScreen.currScore);
+        PlayScreen.scoreBox.setText("Total " + Digits.format(PlayScreen.currScore));
         PlayScreen.manaBar.setProgress(PlayScreen.currMana);
+        PlayScreen.passiveBox.setText("Sec " + Digits.format(PlayScreen.currPassive));
+        PlayScreen.clickBox.setText("Click " + Digits.format(PlayScreen.currClickVal));
     }
 
 
     /*
     Updates the maximum possible Mana obtainable
      */
-    protected static void mana(int newMax){
+    protected static void maxMana(int newMax){
         PlayScreen.maxMana = newMax;
         PlayScreen.manaBar.setMax(newMax);
     }
 
 
+    /*
+    Checks the cost of each building or spell against available gold/mana respectively
+     */
     protected static void funds(){
 
 
@@ -209,6 +223,28 @@ public class Update {
 
         PlayScreen.pathosEnabled = true;
 
+    }
+
+
+    /*
+    Updates the current passive to be the sum total of all buildings' cumulative passive
+     */
+    protected static void passive(){
+
+
+        if(PlayScreen.pathosEnabled){
+            PlayScreen.currPassive = PlayScreen.neutral1.getCumulativePassive()
+                    + PlayScreen.neutral2.getCumulativePassive()
+                    + PlayScreen.neutral3.getCumulativePassive()
+                    + PlayScreen.pathos1.getCumulativePassive()
+                    + PlayScreen.pathos2.getCumulativePassive()
+                    + PlayScreen.pathos3.getCumulativePassive()
+                    + PlayScreen.deity.getCumulativePassive();
+        } else {
+            PlayScreen.currPassive = PlayScreen.neutral1.getCumulativePassive()
+                    + PlayScreen.neutral2.getCumulativePassive()
+                    + PlayScreen.neutral3.getCumulativePassive();
+        }
     }
 
 

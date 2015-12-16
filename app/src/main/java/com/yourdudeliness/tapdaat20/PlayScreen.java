@@ -6,7 +6,6 @@ import android.os.*;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
@@ -26,10 +25,12 @@ public class PlayScreen extends AppCompatActivity implements View.OnClickListene
     References to elements within the layout
      */
     protected static PopupMenu menu;
-    protected static TextView scoreBox;
+    protected static TextView scoreBox, clickBox, passiveBox;
     protected static Button n1, n2, n3, p1, p2, p3, dt, cp1, cp2, cp3;
     protected static ImageButton mainButton;
     public static ProgressBar manaBar;
+    protected static TextView [] gems;
+
 
     /*
     SCORING VARIABLES
@@ -39,14 +40,16 @@ public class PlayScreen extends AppCompatActivity implements View.OnClickListene
     protected static double totalClicks;
     protected static double totalClickValue;
     protected static double currPassive;
-    protected static int currMana, maxMana;
-    protected static double currPassiveMana;
+    protected static int currMana;
+    protected static int maxMana = 900;
+    protected static int currPassiveMana = 20;
 
     private static boolean threadSet = false;
     private static int coinChance = 2;//Drop rate for coins
     protected static boolean pathosEnabled = false;
     protected static int pathosChosen;
-    protected static Random coinGen;
+    protected static Random gemGen;
+    protected static int gemProbability = 4;
 
 
 
@@ -72,7 +75,9 @@ public class PlayScreen extends AppCompatActivity implements View.OnClickListene
             initializePassive(); //only start a thread if no thread has been previously started
         }
 
-        Update.pathos(pathosChosen);
+        Update.pathos(pathosChosen);//Makes sure pathos buttons are re-enabled when returnign to PlayScreen
+
+        Gems.printGems();//Prints the gems obtained every time user switches back to PlayScreen
 
 
     }
@@ -126,21 +131,6 @@ public class PlayScreen extends AppCompatActivity implements View.OnClickListene
 
     }
 
-    protected static void updatePassive(){
-        if(pathosEnabled){
-            currPassive = neutral1.getCumulativePassive()
-                    + neutral2.getCumulativePassive()
-                    + neutral3.getCumulativePassive()
-                    + pathos1.getCumulativePassive()
-                    + pathos2.getCumulativePassive()
-                    + pathos3.getCumulativePassive()
-                    + deity.getCumulativePassive();
-        } else {
-            currPassive = neutral1.getCumulativePassive()
-                    + neutral2.getCumulativePassive()
-                    + neutral3.getCumulativePassive();
-        }
-    }
 
 
 
@@ -157,8 +147,10 @@ public class PlayScreen extends AppCompatActivity implements View.OnClickListene
             public void run() {
                 if (true) {
 
+                    Update.passive();
                     currScore += currPassive;
                     currMana += currPassiveMana;
+                    Update.funds();
                     Update.printScore();
 
 
@@ -168,6 +160,44 @@ public class PlayScreen extends AppCompatActivity implements View.OnClickListene
         }, SECOND); // tells it to run itself again in 1 second
     }
 
+
+
+
+
+    private void initializeBuildings(){
+
+        neutral1 = new Buildings("Farm", 10, 1);
+        neutral2 = new Buildings("Inn", 30, 5);
+        neutral3 = new Buildings("Blacksmith", 50, 20);
+        //coinCollection = new PathosCoins();
+
+    }
+
+
+    /*
+    Initializes the menu object, adds two dropdown items to it, and sets onClick listeners
+    Also initializes the Intents for use
+     */
+    private void initializeMenu(){
+
+        menu = new PopupMenu(this, findViewById(R.id.menu));
+
+        //No idea about Menu.NONE, but 1 is the id, while "Upgrades" is displayed in the UI dropdown list
+        menu.getMenu().add(Menu.NONE, 1, Menu.NONE, "Upgrades");
+        menu.getMenu().add(Menu.NONE, 2, Menu.NONE, "Trophies");
+
+        //Initialize a View variable containing the current view
+        //############ CHECK IF THIS IS GOOD OR NOT, MIGHT WANT MOST CURENT CONTEXT   ##########   DOUBLECHECK
+        View thisView = this.findViewById(android.R.id.content).getRootView();
+
+        //Initialize the Intents, using individual intents for travel to each activity
+        upScreenIntent = new Intent(thisView.getContext(), UpgradesScreen.class);
+        trophyScreenIntent = new Intent(thisView.getContext(), TrophyScreen.class);
+
+        //Set onClick for the dropdown menu, then for individual menu elements respectively
+        findViewById(R.id.menu).setOnClickListener(this);
+        menu.setOnMenuItemClickListener(this);
+    }
 
     private void initializeButtons(View view){
 
@@ -205,46 +235,16 @@ public class PlayScreen extends AppCompatActivity implements View.OnClickListene
         manaBar.setMax(maxMana);
 
 
+        gems = new TextView[3];//the coins view is used as an array
+        gems[0] = (TextView) view.findViewById(R.id.elf);
+        gems[1] = (TextView)view.findViewById(R.id.human);
+        gems[2] = (TextView) view.findViewById(R.id.orc);
 
 
+        gemGen = new Random();
 
+        clickBox = (TextView) findViewById(R.id.clickVal);
+        passiveBox = (TextView) findViewById(R.id.passiveVal);
 
-
-    }
-
-
-    private void initializeBuildings(){
-
-        neutral1 = new Buildings("Farm", 10, 1);
-        neutral2 = new Buildings("Inn", 30, 5);
-        neutral3 = new Buildings("Blacksmith", 50, 20);
-        //coinCollection = new PathosCoins();
-
-    }
-
-
-    /*
-    Initializes the menu object, adds two dropdown items to it, and sets onClick listeners
-    Also initializes the Intents for use
-     */
-    private void initializeMenu(){
-
-        menu = new PopupMenu(this, findViewById(R.id.menu));
-
-        //No idea about Menu.NONE, but 1 is the id, while "Upgrades" is displayed in the UI dropdown list
-        menu.getMenu().add(Menu.NONE, 1, Menu.NONE, "Upgrades");
-        menu.getMenu().add(Menu.NONE, 2, Menu.NONE, "Trophies");
-
-        //Initialize a View variable containing the current view
-        //############ CHECK IF THIS IS GOOD OR NOT, MIGHT WANT MOST CURENT CONTEXT   ##########   DOUBLECHECK
-        View thisView = this.findViewById(android.R.id.content).getRootView();
-
-        //Initialize the Intents, using individual intents for travel to each activity
-        upScreenIntent = new Intent(thisView.getContext(), UpgradesScreen.class);
-        trophyScreenIntent = new Intent(thisView.getContext(), TrophyScreen.class);
-
-        //Set onClick for the dropdown menu, then for individual menu elements respectively
-        findViewById(R.id.menu).setOnClickListener(this);
-        menu.setOnMenuItemClickListener(this);
     }
 }

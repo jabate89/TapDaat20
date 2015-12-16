@@ -8,19 +8,25 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
-        <activity android:name=".PlayScreen">
+        <activity
+            android:name=".PlayScreen"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".UpgradesScreen">
+        <activity
+            android:name=".UpgradesScreen"
+            android:screenOrientation="portrait">
             <action android:name="android.intent.action.MAIN" />
 
             <category android:name="android.intent.category.LAUNCHER" />
         </activity>
-        <activity android:name=".TrophyScreen">
+        <activity
+            android:name=".TrophyScreen"
+            android:screenOrientation="portrait">
             <action android:name="android.intent.action.MAIN" />
 
             <category android:name="android.intent.category.LAUNCHER" />
