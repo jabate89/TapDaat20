@@ -28,7 +28,7 @@ public class Buildings {
 
         if (costOfNext <= PlayScreen.currScore) {
             PlayScreen.currScore -= costOfNext;//subtracts the cost of the building
-            PlayScreen.printScore();
+            Update.printScore();
             PlayScreen.checkFunds();
 
             totalBuildings += 1;//increments number of buildings

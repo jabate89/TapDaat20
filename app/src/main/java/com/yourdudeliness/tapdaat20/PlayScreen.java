@@ -6,11 +6,14 @@ import android.os.*;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import java.util.Random;
 
 public class PlayScreen extends AppCompatActivity implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
 
@@ -22,8 +25,8 @@ public class PlayScreen extends AppCompatActivity implements View.OnClickListene
     /*
     References to elements within the layout
      */
-    private PopupMenu menu;
-    private static TextView scoreBox;
+    protected static PopupMenu menu;
+    protected static TextView scoreBox;
     protected static Button n1, n2, n3, p1, p2, p3, dt, cp1, cp2, cp3;
     protected static ImageButton mainButton;
     public static ProgressBar manaBar;
@@ -32,16 +35,18 @@ public class PlayScreen extends AppCompatActivity implements View.OnClickListene
     SCORING VARIABLES
      */
     protected static double currScore = 0;
-    private static double currClickVal = 25;
-    private static double totalClicks;
-    private static double totalClickValue;
-    private static double currPassive;
-    private static double currMana;
-    private static double currPassiveMana;
+    protected static double currClickVal = 25;
+    protected static double totalClicks;
+    protected static double totalClickValue;
+    protected static double currPassive;
+    protected static int currMana, maxMana;
+    protected static double currPassiveMana;
 
     private static boolean threadSet = false;
     private static int coinChance = 2;//Drop rate for coins
-    private static boolean pathosEnabled = false;
+    protected static boolean pathosEnabled = false;
+    protected static int pathosChosen;
+    protected static Random coinGen;
 
 
 
@@ -56,9 +61,8 @@ public class PlayScreen extends AppCompatActivity implements View.OnClickListene
 
 
         initializeMenu();
-
         initializeBuildings();
-        View view = (View) this.findViewById(android.R.id.content).getRootView();
+        View view = this.findViewById(android.R.id.content).getRootView();
         initializeButtons(view);
 
         scoreBox = (TextView) findViewById(R.id.score_box);
@@ -67,6 +71,8 @@ public class PlayScreen extends AppCompatActivity implements View.OnClickListene
         if(!threadSet) {
             initializePassive(); //only start a thread if no thread has been previously started
         }
+
+        Update.pathos(pathosChosen);
 
 
     }
@@ -87,79 +93,7 @@ public class PlayScreen extends AppCompatActivity implements View.OnClickListene
     @Override
     public void onClick(View v) {
 
-        //Check id of clicked element
-        switch (v.getId()) {
-
-            case R.id.menu:
-                menu.show();
-                break;
-            case R.id.main_button:
-                //incrementScore();
-                printScore();
-                totalClicks++;
-               /* switch(totalClicks){
-                    case 100:
-                        UpgradesFragment.nextUpgrade("ClickingNumber",0);
-                        break;
-                    case 500:
-                        UpgradesFragment.nextUpgrade("ClickingNumber",1);
-                        break;
-                    case 2500:
-                        UpgradesFragment.nextUpgrade("ClickingNumber",2);
-                }
-                */
-                break;
-            case R.id.neutral_1:
-                neutral1.build();
-                //updateButton("neutral1");
-                break;
-            case R.id.neutral_2:
-                neutral2.build();
-                //updateButton("neutral2");
-                break;
-            case R.id.neutral_3:
-                neutral3.build();
-                //updateButton("neutral3");
-                break;
-            case R.id.pathos_1:
-                if(pathosEnabled){
-                    pathos1.build();
-                    //updateButton("p1");
-                }
-                break;
-            case R.id.pathos_2:
-                if(pathosEnabled){
-                    pathos2.build();
-                    //updateButton("p2");
-                }
-                break;
-
-            case R.id.pathos_3:
-                if(pathosEnabled){
-                    pathos3.build();
-                    //updateButton("p3");
-                }
-                break;
-            case R.id.deity:
-                if(pathosEnabled){
-                    deity.build();
-                    //updateButton("deity");
-                }
-                break;
-            case R.id.power_1:
-                //SpellCast.power1();
-                break;
-            case R.id.power_2:
-                if(pathosEnabled){
-                    //SpellCast.power2();
-                }
-                break;
-            case R.id.power_3:
-                if(pathosEnabled){
-                    //SpellCast.power3();
-                }
-                break;
-        }
+        Update.button(v);
 
     }
 
@@ -187,28 +121,6 @@ public class PlayScreen extends AppCompatActivity implements View.OnClickListene
     }
 
 
-    protected static void printScore(){
-        currScore += currClickVal;
-        totalClickValue += currClickVal;
-        totalClicks += 1;
-        scoreBox.setText("Score is " + currScore);
-        //primary_activity.testbox.setText(Integer.toString(MainActivity.totalClickValue));
-
-        //checkUpgrades();
-
-        /*
-        isCoin = coinGen.nextInt(100);//generate random number < 100
-
-        if(isCoin < coinChance){
-            //generate a coin if rand is less than the percentage chance of receiving a coin
-            coinCollection.generateCoin(coinGen.nextInt(3));
-        }
-
-        checkFunds();
-        */
-
-
-    }
 
     protected static void checkFunds(){
 
@@ -246,7 +158,8 @@ public class PlayScreen extends AppCompatActivity implements View.OnClickListene
                 if (true) {
 
                     currScore += currPassive;
-                    scoreBox.setText("Score is " + currScore);
+                    currMana += currPassiveMana;
+                    Update.printScore();
 
 
                 }
@@ -268,6 +181,10 @@ public class PlayScreen extends AppCompatActivity implements View.OnClickListene
         p3 = (Button) view.findViewById(R.id.pathos_3);
         dt = (Button) view.findViewById(R.id.deity);
 
+        cp1 = (Button) view.findViewById(R.id.power_1);
+        cp2 = (Button) view.findViewById(R.id.power_2);
+        cp3 = (Button) view.findViewById(R.id.power_3);
+
         mainButton.setOnClickListener(this);
         n1.setOnClickListener(this);
         n2.setOnClickListener(this);
@@ -276,6 +193,17 @@ public class PlayScreen extends AppCompatActivity implements View.OnClickListene
         p2.setOnClickListener(this);
         p3.setOnClickListener(this);
         dt.setOnClickListener(this);
+        cp1.setOnClickListener(this);
+        cp2.setOnClickListener(this);
+        cp3.setOnClickListener(this);
+
+        n1.setText(neutral1.printStats());
+        n2.setText(neutral2.printStats());
+        n3.setText(neutral3.printStats());
+
+        manaBar = (ProgressBar) view.findViewById(R.id.mana_bar);
+        manaBar.setMax(maxMana);
+
 
 
 
@@ -309,7 +237,7 @@ public class PlayScreen extends AppCompatActivity implements View.OnClickListene
 
         //Initialize a View variable containing the current view
         //############ CHECK IF THIS IS GOOD OR NOT, MIGHT WANT MOST CURENT CONTEXT   ##########   DOUBLECHECK
-        View thisView = (View) this.findViewById(android.R.id.content).getRootView();
+        View thisView = this.findViewById(android.R.id.content).getRootView();
 
         //Initialize the Intents, using individual intents for travel to each activity
         upScreenIntent = new Intent(thisView.getContext(), UpgradesScreen.class);

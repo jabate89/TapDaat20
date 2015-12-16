@@ -11,14 +11,13 @@
     style="bold">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="70dp"
         android:layout_height="wrap_content"
         android:text="MENU"
         android:id="@+id/menu"
-        android:layout_centerVertical="true"
-        android:layout_alignEnd="@+id/human"
         android:textStyle="bold"
-        />
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/human" />
 
     <ImageButton
         android:layout_width="70dp"
@@ -160,7 +159,7 @@
         android:gravity="center"
         android:textStyle="bold"
         android:layout_alignBottom="@+id/neutral_3"
-        android:layout_alignEnd="@+id/passiveVal" />
+        android:layout_toEndOf="@+id/clickVal" />
 
     <TextView
         android:layout_width="30dp"
@@ -171,13 +170,13 @@
         android:gravity="center"
         android:textStyle="bold"
         android:layout_alignTop="@+id/human"
-        android:layout_toEndOf="@+id/passiveVal" />
+        android:layout_toEndOf="@+id/power_1" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Small Text"
+        android:text="Click 0"
         android:id="@+id/clickVal"
         android:layout_above="@+id/passiveVal"
         android:layout_alignParentLeft="true"
@@ -188,7 +187,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Small Text"
+        android:text="Sec 0"
         android:id="@+id/passiveVal"
         android:layout_alignBottom="@+id/neutral_2"
         android:layout_alignParentLeft="true"
@@ -199,7 +198,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
+        android:text="Total 0"
         android:id="@+id/score_box"
         android:layout_alignParentLeft="true"
         android:textStyle="bold"
